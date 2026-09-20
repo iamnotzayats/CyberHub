@@ -57,3 +57,27 @@ async def get_news_by_slug(
         raise HTTPException(status_code=404, detail="Новость не найдена")
 
     return news
+
+@v1_news_router.patch("/news/update/{slug}", tags=["news"])
+async def update_news(
+    slug: str = Path(..., min_length=1),
+    title: str | None = Query(None, min_length=1, max_length=255),
+    content: str | None = Query(None, min_length=1),
+    is_published: bool | None = Query(None),
+    session: AsyncSession = Depends(get_session),
+):
+    result = await session.execute(select(News).where(News.slug == slug))
+    news = result.scalar_one_or_none()
+    if news is None:
+        raise HTTPException(status_code=404, detail="Новость не найдена")
+
+    if title is not None:
+        news.title = title
+    if content is not None:
+        news.content = content
+    if is_published is not None:
+        news.is_published = is_published
+
+    await session.commit()
+    await session.refresh(news)
+    return news 
