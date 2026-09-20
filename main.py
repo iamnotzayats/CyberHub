@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 
-from routers import news_router, parameters_router
+from routers import news, parameters
 
 app = FastAPI()
 
-app.include_router(news_router.v1_news_router)
-app.include_router(parameters_router.v1_settings_router)
+app.include_router(news.v1_news_router)
+app.include_router(parameters.v1_settings_router)
 
 
